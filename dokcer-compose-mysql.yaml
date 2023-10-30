@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  nacos:
+    image: nacos/nacos-server:v2.2.3
+    container_name: nacos-standalone-mysql
+    environment:
+        PREFER_HOST_MODE: hostname
+        MODE: standalone
+        SPRING_DATASOURCE_PLATFORM: mysql
+        NACOS_AUTH_IDENTITY_KEY: 2222
+        NACOS_AUTH_IDENTITY_VALUE: 2xxx
+        NACOS_AUTH_TOKEN: SecretKey012345678901234567890123456789012345678901234567890123456789
+    # env_file:
+    #   - ../env/custom-application-config.env
+    volumes:
+      - ./data/standalone-logs/:/home/nacos/logs
+      - ./data/init.d/application.properties:/home/nacos/conf/application.properties
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: always
+  mysql:
+    container_name: mysql
+    build:
+      context: .
+      dockerfile: ./build/Dockerfile
+    image: tonyhsu0111/mysql:5.7
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: nacos_devtest
+        MYSQL_USER: nacos
+        MYSQL_PASSWORD: nacos
+        LANG: C.UTF-8
+    # env_file:
+    #   - ../env/mysql.env
+    volumes:
+      - ./data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10

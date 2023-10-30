@@ -1,0 +1,6 @@
+{
+    "dsn": "root:1qaz2wsx3edc@tcp(192.168.10.39:3306)/testdb",
+    "stat_sql": "SELECT COUNT(*) FROM source_table",
+    "insert_sql": "INSERT INTO stats_table (count_column) VALUES (?)",
+    "freq": 10
+}
